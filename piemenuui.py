@@ -174,6 +174,7 @@ class PieMenuUI(QWidget):
             bcmd.y_offset = bcmd.y_offset - sz.height()
         elif pos == 1:
             bcmd.y_offset = bcmd.y_offset - sz.height()/2
+            pass
         elif pos == 3 or pos == 5:
             bcmd.x_offset = bcmd.x_offset - sz.width()
             bcmd.y_offset = bcmd.y_offset - sz.height()/2
