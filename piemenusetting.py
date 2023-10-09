@@ -282,7 +282,7 @@ class PMEditor(QWidget):
         sliderlayout.addWidget(QLabel("80"))
         self.radius = QSlider(Qt.Horizontal)
         sliderlayout.addWidget(self.radius)
-        self.radius.setMinimum(100)
+        self.radius.setMinimum(80)
         self.radius.setMaximum(200)
         curv = param.GetInt("Radius")
         self.radius.setValue(curv)
