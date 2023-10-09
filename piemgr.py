@@ -169,7 +169,7 @@ class PMManager(QObject):
                                 return n
                             else:
                                 return None
-                        nd = self.matchMenuTree(n,sel,num,stk)
+                        nd = self.matchMenuTree(n,sel,num)
                         if nd != None:
                             return nd
                 for n in node.children:
