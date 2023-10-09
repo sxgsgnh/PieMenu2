@@ -303,8 +303,19 @@ class PMEditor(QWidget):
         szlayout.addWidget(self.maxwidth)
         self.maxwidth.valueChanged.connect(self.onMaxWidthChanged)
         szlayout.addWidget(self.labelmax)
-
         leftlayout.addLayout(szlayout)
+
+        self.matchmode = QComboBox()
+        self.matchmode.addItem("Normal")
+        self.matchmode.addItem("KeepRoot")
+        self.matchmode.addItem("Parent")
+        self.matchmode.currentIndexChanged.connect(self.onMatchModeChanged)
+        self.matchmode.setCurrentIndex(param.GetInt("MatchMode"))
+        mlayout = QHBoxLayout()
+        mlayout.addWidget(QLabel("MatchMode:"))
+        mlayout.addWidget(self.matchmode)
+        leftlayout.addLayout(mlayout)
+
         leftlayout.addStretch()
         leftlayout.setContentsMargins(0,0,20,0)
         rightlayout.setContentsMargins(20,0,0,0)
@@ -314,11 +325,15 @@ class PMEditor(QWidget):
         setting.setLayout(layout)
         return setting
 
+    def onMatchModeChanged(self,index):
+        param = App.ParamGet(ParamsRoot + "Setting/")
+        param.SetInt("MatchMode",index)
+
     def onMaxWidthChanged(self,v):
         param = App.ParamGet(ParamsRoot + "Setting/")
         param.SetInt("maxWidth", v)
         self.labelmax.setText(str(v))
-        pass
+
     def onGlobalStyle(self):
         path = ParamsRoot + "Setting/"
         param = App.ParamGet(path)

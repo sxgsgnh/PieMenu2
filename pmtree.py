@@ -26,7 +26,7 @@ class PMTreeNode():
     object = ""
     menu = None
     children = None
-
+    parent = None
     def __init__(self,view = "",menu = None):
         self.menu = menu
         self.view = view
@@ -48,6 +48,7 @@ class PMTreeNode():
         return None
 
     def addChild(self,node):
+        node.parent = self
         self.children.append(node)
 
     def isMatch(self,obj):

@@ -74,6 +74,8 @@ class PMManager(QObject):
             param.SetInt("Radius",100)
             self.radius = 100
 
+        self.matchmode = param.GetInt("MatchMode")
+
         self.globalstyle = param.GetBool("GlobalStyle")
         self.cmd_style = param.GetString("CommandStyle")
         self.label_style = param.GetString("LabelStyle")
@@ -167,7 +169,7 @@ class PMManager(QObject):
                                 return n
                             else:
                                 return None
-                        nd = self.matchMenuTree(n,sel,num)
+                        nd = self.matchMenuTree(n,sel,num,stk)
                         if nd != None:
                             return nd
                 for n in node.children:
@@ -230,6 +232,7 @@ class PMManager(QObject):
 
         sel = Gui.Selection.getSelectionEx(App.ActiveDocument.Name)
         view = str(Gui.activeView())
+        menu_stk = [None]
 
         if keymap in self.__global_wb:
             root = self.__global_wb[keymap]
@@ -244,8 +247,28 @@ class PMManager(QObject):
             root = self.__current_wb[keymap]
             laver = 0
             node = self.matchMenuTree(root,sel,laver)
-            if node != None and node.disable == False and node.view == view:
-                return node.menu
+            ret_node = None
+            if self.matchmode == 0:
+                if node.disable == False:
+                    ret_node = node
+            elif self.matchmode == 1:
+                if node == None or node.disable == True:
+                    ret_node = root
+                else:
+                    ret_node = node
+            else:
+                if self.matchmode == 2:
+                    ret_node = node
+                    while True:
+                        if ret_node.disable == False:
+                            break
+                        else:
+                            if ret_node.parent == None:
+                                break
+                            ret_node = ret_node.parent
+
+            if ret_node and ret_node.view == view:
+                return ret_node.menu
         return None
 
     def onMenuHide(self):
