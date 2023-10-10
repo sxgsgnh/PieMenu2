@@ -501,8 +501,10 @@ class PMEditor(QWidget):
             return
         base = path
         param = App.ParamGet(base)
-        if param.HasGroup(title):
-            QMessageBox.information(None, "menu already exist!")
+        print(title,base)
+        g = param.GetGroups()
+        if str(title) in g:
+            QMessageBox.information(None, "Error","menu already exist!")
             return
         item = QTreeWidgetItem()
         item.setText(0, str(title))

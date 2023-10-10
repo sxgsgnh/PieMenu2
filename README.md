@@ -10,15 +10,15 @@
 
 Linux:
 
-`/home/user/.FreeCAD/Mod/PieMenu2/InitGui.py`
+`/home/user/.FreeCAD/Mod/PieMenu/InitGui.py`
 
 macOS:
 
-`/Users/user_name/Library/Preferences/FreeCAD/Mod/PieMenu2/InitGui.py`
+`/Users/user_name/Library/Preferences/FreeCAD/Mod/PieMenu/InitGui.py`
 
 Windows:
 
-`C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\PieMenu2\InitGui.py`
+`C:\Users\user_name\AppData\Roaming\FreeCAD\Mod\PieMenu\InitGui.py`
 
 ## 用法
 使用方法基本与blender的piemenu一样。  
