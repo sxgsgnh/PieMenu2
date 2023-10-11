@@ -29,14 +29,9 @@ from PySide2.QtCore import QObject, QRect, QEvent,Signal
 from PySide2.QtGui import QCursor, QKeySequence
 from threading import Timer
 from piemenuui import PieMenuUI
-from pmtree import PMTreeNode
+from pmtree import PMTreeNode,delNumber
 
-def delNumber(s):
-    n = ""
-    for c in s:
-        if not c.isnumeric():
-            n += c
-    return n
+
 
 
 class PMManager(QObject):
@@ -156,117 +151,86 @@ class PMManager(QObject):
         pt = self.__mainwindow.mapToGlobal(cent.pos())
         return QRect(pt, cent.size()).contains(pos)
 
-    def matchMenuTree(self,node,sel,num):
+    def matchMenuTree(self,node,sel,num,stk):
         count = len(sel)
         if count == 1:
             if num == 0:
-                num += 1
                 obj = delNumber(sel[0].ObjectName)
-                sublen = len(sel[0].SubElementNames)
-                for n in node.children:
-                    if n.object == obj:
-                        if len(n.children) == 0:
-                            if sublen == 0:
-                                return n
-                            else:
-                                return None
-                        nd = self.matchMenuTree(n,sel,num)
-                        if nd != None:
-                            return nd
-                for n in node.children:
-                    if n.object == '*':
-                        if len(n.children) == 0:
+                n = node.getNode(obj)
+                if n == None:
+                    n = node.getNode('*')
+                if n != None:
+                    stk.append(n)
+                    if n.count() != 0:
+                        num += 1
+                        if (len(sel[0].SubElementNames)) != 0:
+                            n1 = self.matchMenuTree(n,sel,num,stk)
+                            if n1 != None:
+                                return n1
+                        else:
                             return n
-                        nd = self.matchMenuTree(n, sel, num)
-                        if nd != None:
-                            return nd
-                num -= 1
-            elif num == 1:
-                num += 1
-                for n in node.children:
-                    sub = sel[0].SubElementNames
-                    if len(sub) == 0:
-                        return node
-                    nd = self.matchMenuTree(n, sel, num)
-                    if nd != None:
-                        return nd
-                num -= 1
-
+                        num -= 1
+                    else:
+                        if(len(sel[0].SubElementNames)) == 0:
+                            return n
             else:
-                if num == 2:
-                    sub = sel[0].SubElementNames
-                    obj = delNumber(sub[0])
-                    if node.object == obj:
-                        return node
+                if num == 1:
+                    n = node.getNode(delNumber(sel[0].SubElementNames[0]))
+                    if n != None:
+                        stk.append(n)
+                        return n
         elif count > 1:
             if num == 0:
-                if len(node.children) == 0:
-                    return None
-                ret = None
-                for n in node.children:
-                    objcnt = 0
-                    if n.object == '':
-                        continue
-                    if n.object[-1] == '+':
-                        obj = n.object[0:-1]
-                        for s in sel:
-                            if obj == delNumber(s.ObjectName):
-                                objcnt += 1
-                        if objcnt > 1:
-                            ret = n
-                            break
-                if ret != None:
-                    return ret
-                else:
+                ret = node.getMultiSelectionObject(sel)
+                if ret == None:
                     for n in node.children:
                         if n.object == '':
                             continue
                         if n.object == '*+':
-                            return n
+                            ret = n
+                if ret:
+                    stk.append(ret)
+                    return ret
         else:
             if num == 0:
                 return node
         return None
 
     def matchMenu(self, keymap):
-
-        sel = Gui.Selection.getSelectionEx(App.ActiveDocument.Name)
+        docname = App.ActiveDocument.Name
+        if docname == None:
+            return
+        sel = Gui.Selection.getSelectionEx(docname)
         view = str(Gui.activeView())
+
+        menu_stack = [None]
 
         if keymap in self.__global_wb:
             root = self.__global_wb[keymap]
             if len(root.children) == 0 and root.disable == False and root.view == view:
                 return root.menu
             laver = 0
-            node = self.matchMenuTree(root,sel,laver)
+            node = self.matchMenuTree(root,sel,laver,menu_stack)
             if node != None and node.disable == False and node.view == view:
                 return node.menu
 
         if keymap in self.__current_wb:
             root = self.__current_wb[keymap]
+            menu_stack.append(root)
             laver = 0
-            node = self.matchMenuTree(root,sel,laver)
+            node = self.matchMenuTree(root,sel,laver,menu_stack)
             ret_node = None
             if self.matchmode == 0:
-                if node.disable == False:
-                    ret_node = node
+                ret_node = node
             elif self.matchmode == 1:
-                if node == None or node.disable == True:
+                if not node:
                     ret_node = root
                 else:
                     ret_node = node
             else:
                 if self.matchmode == 2:
-                    ret_node = node
-                    while True:
-                        if ret_node.disable == False:
-                            break
-                        else:
-                            if ret_node.parent == None:
-                                break
-                            ret_node = ret_node.parent
-
-            if ret_node and ret_node.view == view:
+                    ret_node = menu_stack.pop()
+            if ret_node and ret_node.disable == False and ret_node.view == view:
                 return ret_node.menu
         return None
 

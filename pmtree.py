@@ -20,6 +20,13 @@
 # http://forum.freecadweb.org/
 # http://www.freecadweb.org/wiki/index.php?title=Code_snippets
 
+def delNumber(s):
+    n = ""
+    for c in s:
+        if not c.isnumeric():
+            n += c
+    return n
+
 class PMTreeNode():
     disable = False
     view = ""
@@ -51,5 +58,20 @@ class PMTreeNode():
         node.parent = self
         self.children.append(node)
 
+    def getMultiSelectionObject(self,selobj):
+        for n in self.children:
+            objcnt = 0
+            if n.object == '':
+                continue
+            if n.object[-1] == '+':
+                obj = n.object[0:-1]
+                for s in selobj:
+                    if obj == delNumber(s.ObjectName):
+                        objcnt += 1
+                if objcnt > 1:
+                    return n
+        return None
+    def count(self):
+        return len(self.children)
     def isMatch(self,obj):
         return self.object == obj
