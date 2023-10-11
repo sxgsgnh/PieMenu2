@@ -106,7 +106,7 @@ class PiePushButton(QPushButton):
 
 class PieMenuUI(QWidget):
     name = "Default"
-    keymap = None
+    keymap = ""
     trigger = ""
     radius = 100
     __origin = None
@@ -120,6 +120,7 @@ class PieMenuUI(QWidget):
 
     def __init__(self, parent, name,radius=130):
         super().__init__(parent)
+        self.keymap = ''
         self.angle = 0
         self.setWindowFlags(Qt.ToolTip | Qt.WindowDoesNotAcceptFocus)
         self.setAttribute(Qt.WA_TranslucentBackground)

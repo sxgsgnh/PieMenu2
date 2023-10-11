@@ -45,7 +45,6 @@ class PMManager(QObject):
     __global_wb = None
     __current_wb = None
     __cur_menu = None
-
     __mainwindow = None
 
     __wbloaded = Signal()
@@ -123,8 +122,10 @@ class PMManager(QObject):
 
         pt = QCursor.pos()
         if self.canShowMenu(pt):
+            if self.__cur_menu and not self.__cur_menu.isHidden():
+                return True
             self.__cur_menu = self.matchMenu(keymap)
-            if self.__cur_menu != None and self.__cur_menu.trigger == "Press":
+            if self.__cur_menu and self.__cur_menu.trigger == "Press":
                 self.__cur_menu.showMenu(pt.x(), pt.y())
                 return True
         return False
@@ -228,11 +229,9 @@ class PMManager(QObject):
         return None
 
     def matchMenu(self, keymap):
-        self.__cur_menu = None
 
         sel = Gui.Selection.getSelectionEx(App.ActiveDocument.Name)
         view = str(Gui.activeView())
-        menu_stk = [None]
 
         if keymap in self.__global_wb:
             root = self.__global_wb[keymap]
@@ -294,11 +293,12 @@ class PMManager(QObject):
             pm = App.ParamGet(path + m + '/')
             key = pm.GetString('TriggerKey')
             if key != "":
-                menu = self.loadPieMenuTree(path+m+'/',key)
-                menus[key] = menu
+                node = self.loadPieMenuTree(path+m+'/',key)
+                menus[key] = node
         return menus
 
     def loadPieMenuTree(self,path,keymap):
+
         pm = App.ParamGet(path)
         pmnode = PMTreeNode()
         pmnode.disable = not pm.GetBool('Enable')
@@ -313,12 +313,12 @@ class PMManager(QObject):
         pmnode.view = tview
         pmnode.object = s
         menu = PieMenuUI(Gui.getMainWindow(), pm.GetGroupName(), self.radius)
-        menu.keymap = keymap
         menu.loadPieMenu(path,self.maxWidth)
         if not self.globalstyle:
             menu.setStyleSheet(self.label_style)
             menu.setCommandButtonStylesheet(self.cmd_style)
         menu.onMenuHide.connect(self.onMenuHide)
+        menu.keymap = keymap
         pmnode.menu = menu
 
         for item in pm.GetGroups():
