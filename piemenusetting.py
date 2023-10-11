@@ -428,7 +428,7 @@ class PMEditor(QWidget):
 
         self.addpm = self.AddIconButton(self.edit,"PieMenuAdd.svg",25,self.onAddTopMenu)
         self.addpm.setToolTip("add a top menu.")
-        self.addchild = self.AddIconButton(self.edit, "PieMenuAdd.svg", 25, self.onAddChildMenu)
+        self.addchild = self.AddIconButton(self.edit, "PieMenuAddCommand.svg", 25, self.onAddChildMenu)
         self.addchild.setToolTip("add a sub menu.")
         self.rempm = self.AddIconButton(self.edit,"PieMenuRemove.svg",25,self.onRemPmClick)
         self.rempm.setToolTip("remove a menu.")
