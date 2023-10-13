@@ -24,8 +24,8 @@ import time
 
 import FreeCAD as App
 import FreeCADGui as Gui
-from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import QObject, QRect, QEvent,Signal
+from PySide2.QtWidgets import QApplication,QDockWidget
+from PySide2.QtCore import QObject, QRect, QEvent, Signal, Qt
 from PySide2.QtGui import QCursor, QKeySequence
 from threading import Timer
 from piemenuui import PieMenuUI
@@ -197,10 +197,10 @@ class PMManager(QObject):
         return None
 
     def matchMenu(self, keymap):
-        docname = App.ActiveDocument.Name
-        if docname == None:
+        doc = App.ActiveDocument
+        if doc == None:
             return
-        sel = Gui.Selection.getSelectionEx(docname)
+        sel = Gui.Selection.getSelectionEx(doc.Name)
         view = str(Gui.activeView())
 
         menu_stack = [None]
